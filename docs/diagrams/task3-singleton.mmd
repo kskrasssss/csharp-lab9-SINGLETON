@@ -1,0 +1,53 @@
+classDiagram
+direction LR
+
+class FleetMap {
+  <<Singleton>>
+  -Lazy~FleetMap~ _instance$
+  -object _lock
+  -Dictionary~string, FleetCar~ _cars
+  +FleetMap Instance$
+  +string Id
+  -FleetMap()
+  +Reserve(string plate, string requester) OperationResult
+  +Issue(string plate, string client) OperationResult
+  +Describe() IReadOnlyList~string~
+}
+
+class FleetCar {
+  +string Plate
+  +double Latitude
+  +double Longitude
+  +CarStatus Status
+  +string ReservedFor
+}
+
+class CarStatus {
+  <<enumeration>>
+  Free
+  Reserved
+  InRent
+}
+
+class OperationResult {
+  <<record>>
+  +bool Success
+  +string Message
+}
+
+class DispatcherModule {
+  <<Client>>
+  +Reserve(string plate, string client) void
+}
+
+class MobileAppModule {
+  <<Client>>
+  +Issue(string plate, string client) void
+}
+
+FleetMap "1" *-- "0..*" FleetCar : _cars
+FleetCar --> CarStatus
+FleetMap ..> OperationResult : returns
+DispatcherModule ..> FleetMap : Instance
+MobileAppModule ..> FleetMap : Instance
+note for FleetMap "Приватний конструктор і статичний Instance: другого екземпляра не існує"
