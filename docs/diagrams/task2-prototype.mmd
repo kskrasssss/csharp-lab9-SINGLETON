@@ -1,0 +1,51 @@
+classDiagram
+direction LR
+
+class IPrototype~T~ {
+  <<interface, Prototype>>
+  +Clone() T
+}
+
+class TariffPlan {
+  <<Concrete Prototype>>
+  +string Name
+  +string Owner
+  +decimal PricePerMinute
+  +decimal PricePerKm
+  +int SpeedLimitKmh
+  +InsuranceTerms Insurance
+  +List~EndZone~ EndZones
+  +List~string~ Bonuses
+  -TariffPlan()
+  -TariffPlan(TariffPlan source)
+  +CreateStandard()$ TariffPlan
+  +Clone() TariffPlan
+  +CloneFor(string company) TariffPlan
+}
+
+class InsuranceTerms {
+  <<Concrete Prototype>>
+  +string Coverage
+  +decimal Deductible
+  +Clone() InsuranceTerms
+}
+
+class EndZone {
+  <<Concrete Prototype>>
+  +string Name
+  +decimal ExtraFee
+  +Clone() EndZone
+}
+
+class DemoRunner {
+  <<Client>>
+  +RunTariffPrototypeScenario()$ void
+}
+
+IPrototype <|.. TariffPlan
+IPrototype <|.. InsuranceTerms
+IPrototype <|.. EndZone
+TariffPlan "1" *-- "1" InsuranceTerms : Insurance
+TariffPlan "1" *-- "0..*" EndZone : EndZones
+DemoRunner ..> TariffPlan : clones
+note for TariffPlan "Clone виконує глибоке копіювання: нові InsuranceTerms і EndZone"

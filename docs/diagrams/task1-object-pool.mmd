@@ -1,0 +1,50 @@
+classDiagram
+direction LR
+
+class CarPool {
+  <<Object Pool>>
+  -object _lock
+  -Queue~Car~ _idle
+  -List~Car~ _all
+  -Queue~CarSpec~ _notCommissioned
+  +int TotalCreated
+  +TryAcquire(Client client) Car
+  +Release(Car car) void
+}
+
+class Car {
+  <<Pooled Object>>
+  +string Plate
+  +string Model
+  +int TripsCount
+  +Client CurrentClient
+  +StartTrip(Client client) void
+  +ResetForNextClient() void
+}
+
+class PersonalSettings {
+  +string MultimediaAccount
+  +List~string~ NavigatorAddresses
+  +int SeatPosition
+  +Reset() void
+}
+
+class RentalDispatcher {
+  <<Client>>
+  -Queue~Client~ _waiting
+  +RequestCar(Client client) Car
+  +FinishTrip(Car car) Car
+}
+
+class Client {
+  <<record>>
+  +string Name
+}
+
+CarPool "1" o-- "0..4" Car : _all
+CarPool "1" o-- "0..*" Car : _idle
+Car "1" *-- "1" PersonalSettings : Settings
+Car "0..1" --> "0..1" Client : CurrentClient
+RentalDispatcher "1" --> "1" CarPool : _pool
+RentalDispatcher "1" o-- "0..*" Client : _waiting
+note for CarPool "Не створює авто понад фізичний парк. Release скидає стан авто"
